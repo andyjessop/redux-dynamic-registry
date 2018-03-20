@@ -4,30 +4,7 @@ Redux Dynamic Registry is a tool to dynamically add and remove reducers and midd
 
 It's very small, weighing-in <1KB minified and gzipped.
 
-You can register all of the above as a module:
-
-```js
-import { createStore } from 'redux';
-import registry from 'redux-dynamic-registry';
-import myModule from './my-module';
-
-// myModule: {
-//   middleware: [function],
-//   reducer: function,
-// }
-
-const store = createStore(...);
-
-const myRegistry = registry();
-
-myRegistry.registerModule(store, myModule, 'myName', 1); // The third parameter here is the order for the middleware (optional)
-
-// And to unregister all middleware, reducer, and observers
-myRegistry.unregisterModule(store, 'myName');
-
-```
-
-You can also register reducers, middleware, and observers separately:
+### Usage
 
 ```js
 // Reducer
