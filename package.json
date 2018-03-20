@@ -1,6 +1,6 @@
 {
   "name": "redux-dynamic-registry",
-  "version": "0.3.2-beta",
+  "version": "0.4.2-beta",
   "description": "A dynamic reducer, middleware, and observer registry for Redux",
   "main": "index.js",
   "scripts": {

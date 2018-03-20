@@ -1,15 +1,20 @@
 import { applyMiddleware, createStore } from 'redux';
 import createRegistry from './index';
+import {
+  createDynamicMiddleware,
+  createDynamicReducer,
+} from './index';
 
 const dummyReducer = a => a;
 
 describe('Redux Dynamic Registry', () => {
   test('should register reducer', () => {
     const store = createStore(dummyReducer);
-    const registry = createRegistry();
+
     const reducer = (state, action) => ({ ...state, b: true });
 
-    registry.registerReducer(store, reducer, 'a');
+    const dynamicReducer = createDynamicReducer();
+    dynamicReducer.add(store, reducer, 'a');
 
     store.dispatch({ type: 'test' });
     const state = store.getState();
@@ -19,7 +24,7 @@ describe('Redux Dynamic Registry', () => {
 
   test('should unregister reducer', () => {
     const store = createStore(dummyReducer);
-    const registry = createRegistry();
+
     const reducer = (state = {}, action) => {
       if (action.type === 'test') {
         return { ...state, b: true };
@@ -27,8 +32,9 @@ describe('Redux Dynamic Registry', () => {
       return state;
     };
 
-    registry.registerReducer(store, reducer, 'a');
-    registry.unregisterReducer(store, 'a');
+    const dynamicReducer = createDynamicReducer();
+    dynamicReducer.add(store, reducer, 'a');
+    dynamicReducer.remove(store, 'a');
 
     store.dispatch({ type: 'test', payload: true });
     const state = store.getState();
@@ -37,21 +43,21 @@ describe('Redux Dynamic Registry', () => {
   });
 
   test('should register middleware', () => {
-    let output = false;;
+    let output = false;
 
     const middleware = s => next => action => {
       output = true;
       next(action);
     };
 
-    const registry = createRegistry();
+    const dynamicMiddleware = createDynamicMiddleware();
 
     const store = createStore(
       dummyReducer,
-      applyMiddleware(registry.dynamicMiddleware)
+      applyMiddleware(dynamicMiddleware.middleware)
     );
 
-    registry.registerMiddleware(middleware);
+    dynamicMiddleware.add(middleware);
 
     store.dispatch({ type: 'test' });
 
@@ -66,15 +72,15 @@ describe('Redux Dynamic Registry', () => {
       next(action);
     };
 
-    const registry = createRegistry();
+    const dynamicMiddleware = createDynamicMiddleware();
 
     const store = createStore(
       dummyReducer,
-      applyMiddleware(registry.dynamicMiddleware)
+      applyMiddleware(dynamicMiddleware.middleware)
     );
 
-    registry.registerMiddleware(middleware);
-    registry.unregisterMiddleware(middleware);
+    dynamicMiddleware.add(middleware);
+    dynamicMiddleware.remove(middleware);
 
     store.dispatch({ type: 'test' });
 
