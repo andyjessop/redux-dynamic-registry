@@ -2,10 +2,11 @@ import { createStore } from 'redux';
 import createRegistry from './index';
 
 let registry;
+let store;
 
 describe('Redux Dynamic Registry', () => {
   beforeEach(() => {
-    const store = createStore(a => a);
+    store = createStore(a => a);
     registry = createRegistry(store);
   });
 
