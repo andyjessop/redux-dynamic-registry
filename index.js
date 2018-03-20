@@ -26,7 +26,7 @@ export default (store) => {
     middleware.splice(index, 1);
   };
 
-  const registerReducer = (namespace, reducer) => {
+  const registerReducer = (reducer, namespace) => {
     reducers[namespace] = compose(reducers[namespace] || (a => a), reducer);
 
     store.replaceReducer(combineReducers(reducers));
@@ -61,9 +61,9 @@ export default (store) => {
     return unsubscribe;
   };
 
-  const registerModule = (namespace, module, middlewareOrder) => {
+  const registerModule = (module, namespace, middlewareOrder) => {
     if (module.reducer) {
-      registerReducer(namespace, module.reducer);
+      registerReducer(module.reducer, namespace);
     }
 
     if (module.observers) {
