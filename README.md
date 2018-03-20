@@ -7,13 +7,18 @@ It's very small, weighing-in <1KB minified and gzipped.
 ### Usage
 
 ```js
+import { createStore } from 'redux';
 import createRegistry from 'redux-dynamic-registry';
 
 // Middleware
 const myRegistry = createRegistry();
+
 const store = createStore(
   reducer,
-  applyMiddleware(myRegistry.middleware)
+  applyMiddleware(
+    // ...other app middleware,
+    myRegistry.middleware
+  )
 );
 
 myRegistry.registerMiddleware(middleware, order);
