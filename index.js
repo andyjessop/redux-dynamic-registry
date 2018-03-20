@@ -1,12 +1,9 @@
 import { combineReducers, compose } from 'redux';
 
-export default (s) => {
+export default () => {
   const middleware = [];
   const observers = {};
   const reducers = {};
-  let store = s;
-
-  const attachStore = s => { store = s; };
 
   const dynamicMiddleware = ({ getState, dispatch }) => next => (action) => {
     const middlewareAPI = {
@@ -33,13 +30,13 @@ export default (s) => {
     middleware.splice(index, 1);
   };
 
-  const registerReducer = (reducer, namespace) => {
+  const registerReducer = (store, reducer, namespace) => {
     reducers[namespace] = compose(reducers[namespace] || (a => a), reducer);
 
     store.replaceReducer(combineReducers({ ...reducers }));
   };
 
-  const unregisterReducer = (namespace) => {
+  const unregisterReducer = (store, namespace) => {
     delete reducers[namespace];
 
     const stateKeys = Object.keys(store.getState());
@@ -53,7 +50,7 @@ export default (s) => {
     store.replaceReducer(combineReducers({ ...reducers }));
   };
 
-  const registerObserver = (key, selector, onChange) => {
+  const registerObserver = (store, key, selector, onChange) => {
     let currentState;
 
     const handleChange = () => {
@@ -77,9 +74,9 @@ export default (s) => {
     return unsubscribe;
   };
 
-  const registerModule = (module, namespace, middlewareOrder) => {
+  const registerModule = (store, module, namespace, middlewareOrder) => {
     if (module.reducer) {
-      registerReducer(module.reducer, namespace);
+      registerReducer(store, module.reducer, namespace);
     }
 
     if (module.observers) {
@@ -88,29 +85,28 @@ export default (s) => {
       }
 
       [...module.observers].forEach(obs =>
-        observers[namespace].push(registerObserver(obs.namespace, obs.selector, obs.onChange)),
+        observers[namespace].push(registerObserver(store, obs.namespace, obs.selector, obs.onChange)),
       );
     }
 
     if (module.middleware) {
-      registerMiddleware(module.middleware, middlewareOrder);
+      registerMiddleware(store, module.middleware, middlewareOrder);
     }
   };
 
-  const unregisterModule = (namespace) => {
-    unregisterReducer(namespace);
+  const unregisterModule = (store, namespace) => {
+    unregisterReducer(store, namespace);
 
     [...observers[namespace]].forEach((obs) => {
       obs();
       delete observers[namespace];
     });
 
-    [...module.middleware].forEach(mdw => unregisterMiddleware(mdw));
+    [...module.middleware].forEach(mdw => unregisterMiddleware(store, mdw));
   };
 
 
   return {
-    attachStore,
     dynamicMiddleware,
     registerMiddleware,
     registerModule,

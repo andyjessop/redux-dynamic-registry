@@ -6,10 +6,10 @@ const dummyReducer = a => a;
 describe('Redux Dynamic Registry', () => {
   test('should register reducer', () => {
     const store = createStore(dummyReducer);
-    const registry = createRegistry(store);
+    const registry = createRegistry();
     const reducer = (state, action) => ({ ...state, b: true });
 
-    registry.registerReducer(reducer, 'a');
+    registry.registerReducer(store, reducer, 'a');
 
     store.dispatch({ type: 'test' });
     const state = store.getState();
@@ -19,7 +19,7 @@ describe('Redux Dynamic Registry', () => {
 
   test('should unregister reducer', () => {
     const store = createStore(dummyReducer);
-    const registry = createRegistry(store);
+    const registry = createRegistry();
     const reducer = (state = {}, action) => {
       if (action.type === 'test') {
         return { ...state, b: true };
@@ -27,8 +27,8 @@ describe('Redux Dynamic Registry', () => {
       return state;
     };
 
-    registry.registerReducer(reducer, 'a');
-    registry.unregisterReducer('a');
+    registry.registerReducer(store, reducer, 'a');
+    registry.unregisterReducer(store, 'a');
 
     store.dispatch({ type: 'test', payload: true });
     const state = store.getState();
@@ -51,8 +51,6 @@ describe('Redux Dynamic Registry', () => {
       applyMiddleware(registry.dynamicMiddleware)
     );
 
-    registry.attachStore(store);
-
     registry.registerMiddleware(middleware);
 
     store.dispatch({ type: 'test' });
@@ -74,8 +72,6 @@ describe('Redux Dynamic Registry', () => {
       dummyReducer,
       applyMiddleware(registry.dynamicMiddleware)
     );
-
-    registry.attachStore(store);
 
     registry.registerMiddleware(middleware);
     registry.unregisterMiddleware(middleware);

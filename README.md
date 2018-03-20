@@ -19,12 +19,12 @@ import myModule from './my-module';
 
 const store = createStore(...);
 
-const myRegistry = registry(store);
+const myRegistry = registry();
 
-myRegistry.registerModule(myModule, 'myName', 1); // The third parameter here is the order for the middleware (optional)
+myRegistry.registerModule(store, myModule, 'myName', 1); // The third parameter here is the order for the middleware (optional)
 
 // And to unregister all middleware, reducer, and observers
-myRegistry.unregisterModule('myName');
+myRegistry.unregisterModule(store, 'myName');
 
 ```
 
@@ -32,14 +32,22 @@ You can also register reducers, middleware, and observers separately:
 
 ```js
 // Reducer
-myRegistry.registerReducer(namespace, reducer);
-myRegistry.unregisterReducer(namespace);
+myRegistry.registerReducer(store, namespace, reducer);
+myRegistry.unregisterReducer(store, namespace);
 
 // Middleware
+const myRegistry = registry();
+const store = createStore(
+  reducer,
+  applyMiddleware(myRegistry.middleware)
+);
+
+// As the dynamic middleware is already applied to the store, we don't need to
+// pass it here.
 myRegistry.registerMiddleware(middleware, order);
 myRegistry.unregisterMiddleware(middleware);
 
 // Observer
-const unregister = myRegistry.registerObserver(namespace, selector, onChange);
+const unregister = myRegistry.registerObserver(store, namespace, selector, onChange);
 unregister();
 ```
