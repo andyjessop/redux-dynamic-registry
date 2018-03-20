@@ -2,7 +2,6 @@ import { combineReducers, compose } from 'redux';
 
 export default () => {
   const middleware = [];
-  const observers = {};
   const reducers = {};
 
   const dynamicMiddleware = ({ getState, dispatch }) => next => (action) => {
@@ -50,45 +49,12 @@ export default () => {
     store.replaceReducer(combineReducers({ ...reducers }));
   };
 
-  const registerModule = (store, module, namespace, middlewareOrder) => {
-    if (module.reducer) {
-      registerReducer(store, module.reducer, namespace);
-    }
-
-    if (module.observers) {
-      if (!observers[namespace]) {
-        observers[namespace] = [];
-      }
-
-      [...module.observers].forEach(obs =>
-        observers[namespace].push(registerObserver(store, obs.namespace, obs.selector, obs.onChange)),
-      );
-    }
-
-    if (module.middleware) {
-      registerMiddleware(store, module.middleware, middlewareOrder);
-    }
-  };
-
-  const unregisterModule = (store, namespace) => {
-    unregisterReducer(store, namespace);
-
-    [...observers[namespace]].forEach((obs) => {
-      obs();
-      delete observers[namespace];
-    });
-
-    [...module.middleware].forEach(mdw => unregisterMiddleware(store, mdw));
-  };
-
 
   return {
     dynamicMiddleware,
     registerMiddleware,
-    registerModule,
     registerReducer,
     unregisterMiddleware,
-    unregisterModule,
     unregisterReducer,
   };
 };
