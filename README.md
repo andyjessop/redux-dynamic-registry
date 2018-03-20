@@ -1,6 +1,6 @@
 ## Redux Dynamic Registry
 
-Redux Dynamic Registry is a tool to dynamically add and remove reducers, middleware, and observers. It was conceived to aid code-splitting.
+Redux Dynamic Registry is a tool to dynamically add and remove reducers and middleware. It was conceived to aid code-splitting.
 
 It's very small, weighing-in <1KB minified and gzipped.
 
@@ -14,7 +14,6 @@ import myModule from './my-module';
 // myModule: {
 //   middleware: [function],
 //   reducer: function,
-//   observers: [{ namespace: string, selector: function, onChange: function }]
 // }
 
 const store = createStore(...);
@@ -46,8 +45,4 @@ const store = createStore(
 // pass it here.
 myRegistry.registerMiddleware(middleware, order);
 myRegistry.unregisterMiddleware(middleware);
-
-// Observer
-const unregister = myRegistry.registerObserver(store, namespace, selector, onChange);
-unregister();
 ```

@@ -50,30 +50,6 @@ export default () => {
     store.replaceReducer(combineReducers({ ...reducers }));
   };
 
-  const registerObserver = (store, key, selector, onChange) => {
-    let currentState;
-
-    const handleChange = () => {
-      const state = store.getState();
-      const nextState = selector(state[key]);
-
-      if (nextState !== currentState) {
-        onChange({
-          state: state[key],
-          store,
-          currentState: nextState,
-          previousState: currentState,
-        });
-        currentState = nextState;
-      }
-    };
-
-    const unsubscribe = store.subscribe(handleChange);
-    handleChange();
-
-    return unsubscribe;
-  };
-
   const registerModule = (store, module, namespace, middlewareOrder) => {
     if (module.reducer) {
       registerReducer(store, module.reducer, namespace);
@@ -110,7 +86,6 @@ export default () => {
     dynamicMiddleware,
     registerMiddleware,
     registerModule,
-    registerObserver,
     registerReducer,
     unregisterMiddleware,
     unregisterModule,
