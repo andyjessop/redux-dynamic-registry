@@ -1,16 +1,12 @@
-import { createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
 import createRegistry from './index';
 
-let registry;
-let store;
+const dummyReducer = a => a;
 
 describe('Redux Dynamic Registry', () => {
-  beforeEach(() => {
-    store = createStore(a => a);
-    registry = createRegistry(store);
-  });
-
   test('should register reducer', () => {
+    const store = createStore(dummyReducer);
+    const registry = createRegistry(store);
     const reducer = (state, action) => ({ ...state, b: true });
 
     registry.registerReducer(reducer, 'a');
@@ -19,5 +15,73 @@ describe('Redux Dynamic Registry', () => {
     const state = store.getState();
 
     expect(state.a.b).toEqual(true);
+  });
+
+  test('should unregister reducer', () => {
+    const store = createStore(dummyReducer);
+    const registry = createRegistry(store);
+    const reducer = (state = {}, action) => {
+      if (action.type === 'test') {
+        return { ...state, b: true };
+      }
+      return state;
+    };
+
+    registry.registerReducer(reducer, 'a');
+    registry.unregisterReducer('a');
+
+    store.dispatch({ type: 'test', payload: true });
+    const state = store.getState();
+
+    expect(state.a.b).toBeUndefined();
+  });
+
+  test('should register middleware', () => {
+    let output = false;;
+
+    const middleware = s => next => action => {
+      output = true;
+      next(action);
+    };
+
+    const registry = createRegistry();
+
+    const store = createStore(
+      dummyReducer,
+      applyMiddleware(registry.dynamicMiddleware)
+    );
+
+    registry.attachStore(store);
+
+    registry.registerMiddleware(middleware);
+
+    store.dispatch({ type: 'test' });
+
+    expect(output).toEqual(true);
+  });
+
+  test('should unregister middleware', () => {
+    let output = false;
+
+    const middleware = s => next => action => {
+      output = true;
+      next(action);
+    };
+
+    const registry = createRegistry();
+
+    const store = createStore(
+      dummyReducer,
+      applyMiddleware(registry.dynamicMiddleware)
+    );
+
+    registry.attachStore(store);
+
+    registry.registerMiddleware(middleware);
+    registry.unregisterMiddleware(middleware);
+
+    store.dispatch({ type: 'test' });
+
+    expect(output).toEqual(false);
   });
 });

@@ -1,9 +1,12 @@
 import { combineReducers, compose } from 'redux';
 
-export default (store) => {
+export default (s) => {
   const middleware = [];
   const observers = {};
   const reducers = {};
+  let store = s;
+
+  const attachStore = s => { store = s; };
 
   const dynamicMiddleware = ({ getState, dispatch }) => next => (action) => {
     const middlewareAPI = {
@@ -16,8 +19,12 @@ export default (store) => {
     return compose(...chain)(next)(action);
   };
 
-  const registerMiddleware = (middlewares, order) => {
-    middleware.splice(order, 0, ...middlewares);
+  const registerMiddleware = (mdw, order) => {
+    if (!order) {
+      middleware.push(mdw);
+    } else {
+      middleware.splice(order, 0, mdw);
+    }
   };
 
   const unregisterMiddleware = (middlewareFn) => {
@@ -29,12 +36,21 @@ export default (store) => {
   const registerReducer = (reducer, namespace) => {
     reducers[namespace] = compose(reducers[namespace] || (a => a), reducer);
 
-    store.replaceReducer(combineReducers(reducers));
+    store.replaceReducer(combineReducers({ ...reducers }));
   };
 
   const unregisterReducer = (namespace) => {
     delete reducers[namespace];
-    store.replaceReducer(combineReducers(reducers));
+
+    const stateKeys = Object.keys(store.getState());
+    const reducerKeys = new Set(Object.keys(reducers));
+
+    stateKeys
+      .filter(key => !reducerKeys.has(key)) // state has a key that doesn't have a corresponding reducer
+      .forEach(key => {
+          reducers[key] = state => state === undefined ? null : state;
+      });
+    store.replaceReducer(combineReducers({ ...reducers }));
   };
 
   const registerObserver = (key, selector, onChange) => {
@@ -94,6 +110,7 @@ export default (store) => {
 
 
   return {
+    attachStore,
     dynamicMiddleware,
     registerMiddleware,
     registerModule,
