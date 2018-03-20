@@ -1,0 +1,11 @@
+{
+  "name": "redux-registry",
+  "version": "1.0.0",
+  "description": "A dynamic reducer, middleware, and observer registry for Redux",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "andy@andyjessop.com",
+  "license": "ISC"
+}
