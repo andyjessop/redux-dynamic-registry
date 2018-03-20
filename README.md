@@ -7,19 +7,20 @@ It's very small, weighing-in <1KB minified and gzipped.
 ### Usage
 
 ```js
-// Reducer
-myRegistry.registerReducer(store, namespace, reducer);
-myRegistry.unregisterReducer(store, namespace);
+import createRegistry from 'redux-dynamic-registry';
 
 // Middleware
-const myRegistry = registry();
+const myRegistry = createRegistry();
 const store = createStore(
   reducer,
   applyMiddleware(myRegistry.middleware)
 );
 
-// As the dynamic middleware is already applied to the store, we don't need to
-// pass it here.
 myRegistry.registerMiddleware(middleware, order);
 myRegistry.unregisterMiddleware(middleware);
+
+// Reducer
+myRegistry.registerReducer(store, namespace, reducer);
+myRegistry.unregisterReducer(store, namespace);
+
 ```
