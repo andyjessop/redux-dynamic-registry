@@ -6,7 +6,7 @@ You can register all of the above as a module:
 
 ```js
 import { createStore } from 'redux';
-import registry from './redux-registry';
+import registry from 'redux-registry';
 import myModule from './my-module';
 
 // myModule: {
@@ -19,7 +19,7 @@ const store = createStore(...);
 
 const myRegistry = registry(store);
 
-myRegistry.registerModule(myModule, namespace, 1); // The second parameter here is the order for the middleware (optional)
+myRegistry.registerModule(myModule, namespace, 1); // The third parameter here is the order for the middleware (optional)
 ```
 
 You can also register reducers, middleware, and observers separately:
