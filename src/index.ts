@@ -53,16 +53,19 @@ export const createDynamicMiddleware = (
   };
 };
 
-const defaultReducer = <S, A>(s: S, _a: A): S => s;
-
 export type CreateDynamicReducerFn = {
   add: <S, N extends string>(
     store: Store<S>,
     reducer: Reducer<S>,
     namespace: N
-  ) => void;
-  remove: <S, N extends string>(store: Store<S>, namespace: N) => void;
+  ) => ActionStatus;
+  remove: <S, N extends string>(store: Store<S>, namespace: N) => ActionStatus;
 };
+
+export enum ActionStatus {
+  ERROR,
+  SUCCESS,
+}
 
 export const createDynamicReducer = (
   rdcrs: ReducersMapObject = {}
@@ -71,26 +74,28 @@ export const createDynamicReducer = (
 
   return {
     add: (store, reducer, namespace) => {
-      reducers[namespace] = compose(
-        reducers[namespace] ?? defaultReducer,
-        reducer
-      );
+      if (namespace in reducers) {
+        // Duplicate namespace provided.
+        return ActionStatus.ERROR;
+      }
+
+      reducers[namespace] = reducer;
 
       store.replaceReducer(combineReducers({ ...reducers }));
+
+      return ActionStatus.SUCCESS;
     },
 
-    remove: <S, N extends string>(store: Store<S>, namespace: N): void => {
-      delete reducers[namespace];
+    remove: (store, namespace) => {
+      if (namespace in reducers) {
+        delete reducers[namespace];
 
-      const stateKeys = Object.keys(store.getState());
-      const reducerKeys = new Set(Object.keys(reducers));
+        store.replaceReducer(combineReducers({ ...reducers }));
 
-      stateKeys
-        .filter((key) => !reducerKeys.has(key)) // state has a key that doesn't have a corresponding reducer
-        .forEach((key) => {
-          reducers[key] = (state) => (state === undefined ? null : state);
-        });
-      store.replaceReducer(combineReducers({ ...reducers }));
+        return ActionStatus.SUCCESS;
+      }
+
+      return ActionStatus.ERROR;
     },
   };
 };
