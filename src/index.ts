@@ -1,7 +1,19 @@
+/**
+ * @file Contains the functions responsible for dynamically handling middlewares and reducers. 
+ * @author Urmzd Mukhammadnaim <urmzd@dal.ca>
+ * @since 2022-11-19
+ */
 import { combineReducers, compose, MiddlewareAPI } from "redux";
 import { DynamicMiddlewareFn, DynamicReducerFn, Unpacked } from "src/typings";
 import { Statuses } from "src/constants";
 
+/**
+ * Produces a middleware capable of removing and adding 
+ * various middlewares at runtime.
+ *
+ * @param [middlewares] - A list of initial middlewares. 
+ * @returns - The wrapping middleware and its modification method.
+ */
 export const createDynamicMiddleware: DynamicMiddlewareFn = (
   middlewares = []
 ) => ({
@@ -35,6 +47,13 @@ export const createDynamicMiddleware: DynamicMiddlewareFn = (
   },
 });
 
+/**
+ * Produces a wrapper reducer capable of adding and removing 
+ * given reducers during runtime. 
+ *
+ * @param [reducerMap] - An initial map of the reducer namespace and its associated reducer function. 
+ * @returns - The methods to handle the addition and removal of reducers.   
+ */
 export const createDynamicReducer: DynamicReducerFn = (reducerMap = {}) => ({
   add: (store, reducer, namespace) => {
     if (namespace in reducerMap) {
