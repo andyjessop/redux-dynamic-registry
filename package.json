@@ -2,9 +2,11 @@
   "name": "redux-dynamic-registry",
   "version": "1.0.0",
   "description": "A dynamic reducer, middleware, and observer registry for Redux",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc"
   },
   "author": "andrewdjessop@gmail.com",
   "contributors": [
