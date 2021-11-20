@@ -1,12 +1,18 @@
 {
   "name": "redux-dynamic-registry",
-  "version": "0.4.2-beta",
+  "version": "1.0.0",
   "description": "A dynamic reducer, middleware, and observer registry for Redux",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
   "author": "andrewdjessop@gmail.com",
+  "contributors": [
+    {
+      "name": "Urmzd Mukhammadnaim",
+      "email": "urmzd@dal.ca"
+    }
+  ],
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.26.0",

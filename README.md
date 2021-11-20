@@ -1,6 +1,7 @@
 ## Redux Dynamic Registry
 
-Redux Dynamic Registry is a tool to dynamically add and remove reducers and middleware. It was conceived to aid code-splitting.
+Redux Dynamic Registry is a tool to dynamically add and remove reducers and middleware. 
+It was conceived to aid code-splitting.
 
 It's very small, weighing-in <600B minified and gzipped.
 
