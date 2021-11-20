@@ -1,44 +1,24 @@
-import {
-  combineReducers,
-  compose,
-  Middleware,
-  ReducersMapObject,
-  MiddlewareAPI,
-  Reducer,
-  Store,
-} from "redux";
+import { combineReducers, compose, MiddlewareAPI } from "redux";
+import { DynamicMiddlewareFn, DynamicReducerFn, Unpacked } from "src/typings";
+import { Statuses } from "src/constants";
 
-export enum Statuses {
-  ERROR,
-  SUCCESS,
-}
-
-export type Unpacked<T> = T extends (infer U)[] ? U : T;
-export type Object = Record<string, unknown>;
-
-export type DynamicMiddlewareFn = {
-  middleware: Middleware;
-  add: (m: Middleware, order?: number) => void;
-  remove: (middlewareFn: Middleware) => void;
-};
-
-export const createDynamicMiddleware = (
-  middlewares: Middleware[] = []
-): DynamicMiddlewareFn => ({
+export const createDynamicMiddleware: DynamicMiddlewareFn = (
+  middlewares = []
+) => ({
   middleware:
-    <S>({ getState, dispatch }: MiddlewareAPI<S>) =>
-      (next) =>
-        (action) => {
-          const middlewareAPI: MiddlewareAPI<S> = {
-            getState,
-            dispatch: (act) => dispatch(act),
-          };
+    ({ getState, dispatch }) =>
+    (next) =>
+    (action) => {
+      const middlewareAPI: MiddlewareAPI = {
+        getState,
+        dispatch: (action) => dispatch(action),
+      };
 
-          const chain = middlewares.map((m) => m(middlewareAPI));
-          const chained = compose(...chain) as Unpacked<typeof chain>;
+      const chain = middlewares.map((m) => m(middlewareAPI));
+      const chained = compose(...chain) as Unpacked<typeof chain>;
 
-          return chained(next)(action);
-        },
+      return chained(next)(action);
+    },
 
   add: (middleware, order) => {
     if (!order) {
@@ -49,27 +29,15 @@ export const createDynamicMiddleware = (
   },
 
   remove: (middlewareFn) => {
-    const index = middlewares.findIndex((d: Middleware) => d === middlewareFn);
+    const index = middlewares.findIndex((d) => d === middlewareFn);
 
     middlewares.splice(index, 1);
   },
-})
+});
 
-export type DynamicReducerFn = {
-  add: <S, N extends string>(
-    store: Store<S>,
-    reducer: Reducer<S>,
-    namespace: N
-  ) => Statuses;
-  remove: <S, N extends string>(store: Store<S>, namespace: N) => Statuses;
-};
-
-export const createDynamicReducer = (
-  reducerMap: ReducersMapObject = {}
-): DynamicReducerFn => ({
+export const createDynamicReducer: DynamicReducerFn = (reducerMap = {}) => ({
   add: (store, reducer, namespace) => {
     if (namespace in reducerMap) {
-      // Duplicate namespace provided.
       return Statuses.ERROR;
     }
 

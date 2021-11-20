@@ -8,10 +8,9 @@ import {
 import {
   createDynamicMiddleware,
   createDynamicReducer,
-  Object,
 } from "src/index";
 
-const dummyReducer: Reducer<Object> = (a = {}) => a;
+const dummyReducer: Reducer = (a = {}) => a;
 
 describe("Redux Dynamic Registry", () => {
   test("should register reducer", () => {
@@ -46,13 +45,13 @@ describe("Redux Dynamic Registry", () => {
     store.dispatch({ type: "test", payload: true });
     const state = store.getState();
 
-    expect((state?.a as ReturnType<typeof reducer>)?.b).toBeUndefined();
+    expect(state?.a?.b).toBeUndefined();
   });
 
   test("should register middleware", () => {
     let output = false;
 
-    const middleware: Middleware = (s) => (next) => (action) => {
+    const middleware: Middleware = (_s) => (next) => (action) => {
       output = true;
       next(action);
       return action;
