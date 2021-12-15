@@ -1,6 +1,10 @@
 {
   "name": "redux-dynamic-registry",
   "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/redux/redux-dynamic-registry",
+    "type": "git"
+  },
   "description": "A dynamic reducer, middleware, and observer registry for Redux",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
